@@ -6,7 +6,7 @@ class Contenedor{
 
     constructor(nombre){
         this.nombre = nombre;
-        this.id = this.lastId    
+        this.id = 0 
     }
 
     static dataDelArchivo = [];
@@ -35,11 +35,14 @@ class Contenedor{
             let data = await fs.promises.readFile(this.nombre, "utf8")
             Contenedor.dataDelArchivo = JSON.parse(data)
 
-            let lastId
+            let lastId = 0
 
             Contenedor.dataDelArchivo.forEach(el => {
                 el.id > lastId ? lastId = el.id : null
             })
+            console.log("El id es:" + lastId)
+
+            this.id = lastId
         }
         catch (error) {
         console.log("Todavia no se a ingresado ningun archivo")
@@ -50,7 +53,7 @@ class Contenedor{
         let data
         try {
             data = Contenedor.dataDelArchivo.length ? Contenedor.dataDelArchivo.filter(el => el.id == id) : console.log("No cargo todavia")
-            return data.length ? data[0].title : null
+            return data.length ? data[0] : null
         } catch (error) {
             console.log(error)
         }
@@ -60,7 +63,6 @@ class Contenedor{
 
     getAll(){
         try{
-            console.log(Contenedor.dataDelArchivo)
             return Contenedor.dataDelArchivo
         }
         catch(error){
@@ -70,8 +72,8 @@ class Contenedor{
     }
 
     async deleteById(id){
-        Contenedor.dataDelArchivo = await Contenedor.dataDelArchivo.filter(el => el.id != id)
         try{
+            Contenedor.dataDelArchivo = Contenedor.dataDelArchivo.filter(el => el.id != id)
             
             await this.cargarArchivo()
 
@@ -104,25 +106,28 @@ const run = async () => {
     await archivo.init()
 
 
-    archivo.save({
+    await archivo.save({
         title:'Escuadra',
         price:123.45,
         thumbnail:'https://cdn3.iconfinder.com/data/icons/education-209/64/ruler-triangle-stationary-school-256.png',
     },)
-    archivo.save({
+    await archivo.save({
         title:'Calculadora',
         price:234.56,
         thumbnail:'https://cdn3.iconfinder.com/data/icons/education-209/64/calculator-math-tool-school-256.png', 
     },)
 
-    archivo.save({
+    await archivo.save({
         title:'Globo Terráqueo',
         price:345.67,
         thumbnail: 'https://cdn3.iconfinder.com/data/icons/education-209/64/globe-earth-geograhy-planet-school-256.png',
     },)
     
     console.log(archivo.getById(2))
-    archivo.getAll()
+    console.log(archivo.getAll())
+    await archivo.deleteById(2)    
+    console.log(archivo.getAll())
+
 }
 
 run()
